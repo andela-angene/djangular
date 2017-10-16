@@ -6,6 +6,7 @@ Run this test with: pytest -vs request_test.py
 
 import unittest
 import requests
+from requests.auth import HTTPBasicAuth
 
 # url = 'http://localhost:5000'
 url = 'http://localhost:8000'
@@ -20,14 +21,16 @@ class TestApi(unittest.TestCase):
 
     def test_05_post_snippet(self):
         global test_id
-        req = {'code': 'print("ho")'}
-        res = requests.post(url + '/snippets', json=req).json()
+        req = {'code': 'print("ho")', 'owner': 1}
+        res = requests.post(url + '/snippets', json=req,
+                            auth=HTTPBasicAuth('montaro', 'anthonidas')).json()
         test_id = res['id']
         assert res['code'] == 'print("ho")'
 
     def test_06_put_snippet(self):
-        req = {'code': 'print("haha")'}
-        res = requests.put('{}/snippets/{}'.format(url, test_id), json=req).json()
+        req = {'code': 'print("haha")', 'owner': 1}
+        res = requests.put('{}/snippets/{}'.format(url, test_id), json=req,
+                           auth=HTTPBasicAuth('montaro', 'anthonidas')).json()
         assert res['code'] == 'print("haha")'
 
     def test_07_get_snippet(self):
@@ -39,6 +42,7 @@ class TestApi(unittest.TestCase):
         assert len(res) > 0
 
     def test_09_delete_snippet(self):
-        res = requests.delete('{}/snippets/{}'.format(url, test_id))
+        res = requests.delete('{}/snippets/{}'.format(url, test_id),
+                              auth=HTTPBasicAuth('montaro', 'anthonidas'))
         assert res.status_code == 204
 
